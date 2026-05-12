@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from .database import SessionLocal
 from . import models, schemas
 from .auth import hash_password, verify_password, create_access_token  # changed
+from fastapi import Depends
 from .oauth import oauth
 import os
  
@@ -82,24 +84,34 @@ async def google_login(request: Request):
     )
 
 @router.get("/auth/google/callback")
-async def google_callback(request:Request):
+async def google_callback(request: Request, db: Session = Depends(get_db)):
+    # 1. Get user info from Google
     token = await oauth.google.authorize_access_token(request)
+    user_info = token.get("userinfo")
+    email = user_info["email"]
+    name = user_info.get("name", "Google User")
 
-    user = token.get("userinfo")
+    # 2. Check if user exists in DB; if not, create them
+    db_user = db.query(models.User).filter(models.User.email == email).first()
+    
+    if not db_user:
+        # Create a new user record for the Google login
+        # We use a placeholder for password since they don't need one
+        new_user = models.User(
+            name=name,
+            email=email,
+            password="OAUTH_USER_EXTERNAL" 
+        )
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
 
-    email = user["email"]
+    # 3. Create your app's JWT token
+    access_token = create_access_token(data={"sub": email                                        })
 
-    #creating own JWT token
-    access_token = create_access_token(
-        data={
-            "sub":email
-        }
-    )
-
-    return {
-        "email": email,
-        "access_token": access_token
-    }
+    # 4. Redirect to Vite/React frontend
+    frontend_url = f"http://localhost:5173/dashboard?token={access_token}"
+    return RedirectResponse(url=frontend_url)
     
 @router.get("/auth/google/callback-api")
 def google_callback(request:Request):
