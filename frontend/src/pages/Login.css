@@ -1,17 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap');
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ── Page wrapper ── */
 .auth-page {
   min-height: 100vh;
+  min-height: 100dvh; /* dynamic viewport height for mobile */
   display: flex;
   align-items: center;
   justify-content: center;
   background: #f5f4f0;
-  padding: 2rem 1rem;
+  padding: 1rem;
   font-family: 'DM Sans', sans-serif;
 }
 
+/* ── Card ── */
 .auth-container {
   background: #ffffff;
   border: 0.5px solid rgba(0, 0, 0, 0.12);
@@ -19,9 +22,26 @@
   padding: 2.5rem 2.25rem 2rem;
   width: 100%;
   max-width: 400px;
+
+  /* on very small screens, remove rounded corners and fill edge-to-edge */
 }
 
-/* Brand / Logo area */
+@media (max-width: 430px) {
+  .auth-page {
+    padding: 0;
+    align-items: flex-end;        /* sheet slides up from bottom */
+    background: #f5f4f0;
+  }
+
+  .auth-container {
+    border-radius: 24px 24px 0 0;
+    padding: 2rem 1.5rem 2.5rem;  /* extra bottom padding for home indicator */
+    max-width: 100%;
+    border-bottom: none;
+  }
+}
+
+/* ── Brand / Logo ── */
 .auth-brand {
   display: flex;
   align-items: center;
@@ -36,6 +56,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 .auth-brand-name {
   font-family: 'DM Serif Display', serif;
@@ -43,10 +64,10 @@
   color: #111;
 }
 
-/* Headings */
+/* ── Headings ── */
 .auth-container h2 {
   font-family: 'DM Serif Display', serif;
-  font-size: 26px;
+  font-size: clamp(22px, 5vw, 26px); /* fluid type */
   font-weight: 400;
   color: #111;
   letter-spacing: -0.5px;
@@ -59,7 +80,7 @@
   margin: 0 0 1.75rem;
 }
 
-/* Fields */
+/* ── Fields ── */
 .field {
   margin-bottom: 14px;
 }
@@ -72,19 +93,21 @@
   color: #888;
   margin-bottom: 6px;
 }
+
 .auth-container input[type="email"],
 .auth-container input[type="password"] {
   width: 100%;
-  height: 44px;
+  height: 48px;             /* slightly taller — easier tap target on mobile */
   padding: 0 14px;
   border: 0.5px solid rgba(0, 0, 0, 0.18);
   border-radius: 10px;
   background: #fafaf9;
   color: #111;
   font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
+  font-size: 16px;          /* 16px prevents iOS auto-zoom on focus */
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-appearance: none; /* remove iOS inner shadow */
 }
 .auth-container input:focus {
   border-color: #111;
@@ -92,7 +115,7 @@
   background: #fff;
 }
 
-/* Forgot */
+/* ── Forgot link ── */
 .auth-forgot {
   display: flex;
   justify-content: flex-end;
@@ -102,27 +125,33 @@
   font-size: 12.5px;
   color: #888;
   text-decoration: none;
+  padding: 6px 0;           /* larger tap target */
 }
 .auth-forgot a:hover { color: #111; }
 
-/* Primary button */
+/* ── Primary button ── */
 .auth-container button[type="submit"] {
   width: 100%;
-  height: 46px;
+  height: 48px;
   background: #111;
   color: #fff;
   border: none;
   border-radius: 10px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 14.5px;
+  font-size: 15px;
   font-weight: 500;
   cursor: pointer;
+  touch-action: manipulation; /* remove 300ms tap delay */
   transition: background 0.15s, transform 0.1s;
 }
-.auth-container button[type="submit"]:hover { background: #2a2a2a; }
+.auth-container button[type="submit"]:hover  { background: #2a2a2a; }
 .auth-container button[type="submit"]:active { transform: scale(0.985); }
+.auth-container button[type="submit"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
-/* Divider */
+/* ── Divider ── */
 .divider {
   display: flex;
   align-items: center;
@@ -141,10 +170,10 @@
   background: rgba(0, 0, 0, 0.1);
 }
 
-/* Google button (target your GoogleLoginButton wrapper) */
+/* ── Google button ── */
 .google-btn {
   width: 100%;
-  height: 46px;
+  height: 48px;
   background: #fff;
   border: 0.5px solid rgba(0, 0, 0, 0.18);
   border-radius: 10px;
@@ -156,12 +185,13 @@
   font-size: 14px;
   color: #111;
   cursor: pointer;
+  touch-action: manipulation;
   transition: background 0.15s, transform 0.1s;
 }
-.google-btn:hover { background: #fafaf9; }
+.google-btn:hover  { background: #fafaf9; }
 .google-btn:active { transform: scale(0.985); }
 
-/* Footer */
+/* ── Footer ── */
 .auth-footer {
   text-align: center;
   margin-top: 1.5rem;
@@ -172,7 +202,32 @@
   color: #111;
   font-weight: 500;
   text-decoration: none;
-  border-bottom: 1px solid rgba(0,0,0,0.2);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
   padding-bottom: 1px;
 }
 .auth-footer a:hover { border-color: #111; }
+
+/* ── Error message ── */
+.error-message {
+  background: #fff5f5;
+  border: 0.5px solid rgba(220, 38, 38, 0.25);
+  color: #dc2626;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  margin-bottom: 16px;
+}
+
+/* ── Landscape phones ── */
+@media (max-height: 600px) and (orientation: landscape) {
+  .auth-page {
+    align-items: flex-start;
+    padding: 1rem;
+  }
+  .auth-container {
+    border-radius: 20px;
+    padding: 1.5rem;
+  }
+  .auth-brand { margin-bottom: 1rem; }
+  .auth-container h2 { font-size: 20px; }
+}

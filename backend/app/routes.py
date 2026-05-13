@@ -106,13 +106,10 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(new_user)
 
-    # 3. Create your app's JWT token
+    # 3. Create app's JWT token
     access_token = create_access_token(data={"sub": email                                        })
 
     # 4. Redirect to Vite/React frontend
     frontend_url = f"http://localhost:5173/dashboard?token={access_token}"
     return RedirectResponse(url=frontend_url)
     
-@router.get("/auth/google/callback-api")
-def google_callback(request:Request):
-    print (request)

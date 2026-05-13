@@ -19,7 +19,7 @@ class Login extends Component  {
     e.preventDefault();
     this.setState({loading: true, error:''})
     try {
-      // Note: Ensure your FastAPI endpoint is /login or /token
+      // Note: Ensure  FastAPI endpoint is /login
       const response = await axios.post('http://localhost:8000/login', this.state.formData);
       localStorage.setItem('token', response.data.access_token);
       this.props.navigate('/dashboard');
